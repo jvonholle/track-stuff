@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en" ng-app>
+  <head>
+    <title>KTOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css">
+  </head>
+  
+  <body>
+    <div class="jumbotron">
+       <div class="panel-group" id="accordion">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <button type="buton" class="btn btn-primary" data-toggle="collapse" data-parent="#accordion" data-target="#bluray">blurays</button>
+        </h4>
+      </div>
+      <div id="bluray" class="panel-collapse collapse">
+          <button id="br_show" type="buton" class="btn btn-primary">show</button>
+        <ul id="blst"></ul>
+        <form id="bluray_info" role="form">
+        <div class="form-group">
+          <input type="text" class="form-control" id="br_title" placeholder="Title" name="br_title">
+        </div>
+        <div class="form-group">
+          <select class="form-control" name="br_type">
+            <option>Movie</option>
+            <option>TV</option>
+          </select>
+        </div>
+          <button id="br_add" type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <button type="buton" class="btn btn-primary" data-toggle="collapse" data-parent="#accordion" data-target="#record">record</button>
+        </h4>
+      </div>
+      <div id="record" class="panel-collapse collapse">
+          <button id="r_show" type="buton" class="btn btn-primary">show</button>
+        <ul id="rlst"></ul>
+        <form id="record_info" role="form">
+        <div class="form-group">
+          <input type="text" class="form-control" id="br_title" placeholder="Album Title" name="r_title">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" id="br_type" placeholder="Album Artist" name="r_artist">
+        </div>
+          <button id="r_add" type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <button type="buton" class="btn btn-primary" data-toggle="collapse" data-parent="#accordion" data-target="#book">books</button>
+        </h4>
+      </div>
+      <div id="book" class="panel-collapse collapse">
+          <button id="bk_show" type="buton" class="btn btn-primary">show</button>
+        <ul id="bklst"></ul>
+        <form id="book_info" role="form">
+        <div class="form-group" id="book_info">
+          <input type="text" class="form-control" id="bk_title" placeholder="Title" name="bk_title">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" id="bk_author" placeholder="Author" name="bk_author">
+        </div>
+          <button id="bk_add" type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+  </div> 
+  </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#br_add").click(function() {
+          $.post("/br_add", $("#bluray_info").serialize());
+            var node = document.createElement("LI");
+            var title = document.createTextNode(getElementById("br_title").innerHTML);
+            var type = document.createTextNode(br_type); 
+            var space = document.createTextNode(" | ");
+            node.appendChild(title);
+            node.appendChild(space);
+            node.appendChild(type);
+            document.getElementById("blst").appendChild(node);
+       });
+        $("#br_show").click(function() {
+          $.get("/br_show", function(data) {
+            for(var i = 0; i < data.length; ++i){
+              var node = document.createElement("LI");
+              var title = document.createTextNode(data[i].title);
+              var type = document.createTextNode(data[i].info.directors[0]);
+              var space = document.createTextNode(" | ");
+              node.appendChild(title);
+              node.appendChild(space);
+              node.appendChild(type);
+              document.getElementById("blst").appendChild(node);
+            }
+           document.getElementById("br_show").id = "br_hide";
+           document.getElementById("br_hide").innerHTML = "hide";
+         });
+         $("#br_hide").click(function() {
+           $('#bluray').collapse('hide');
+           var list = document.getElementById("blst");
+           while(list.hasChildNodes()) {
+             list.removeChild(list.firstChild);
+           }
+           document.getElementById("br_hide").innerHTML = "show";
+           document.getElementById("br_hide").id = "br_show";
+         });
+       });
+        $("#r_add").click(function() {
+          $.post("/r_add", $("#record_info").serialize());
+       });
+       $("#r_show").click(function() {
+          $.get("/r_show", function(data) {
+            for(var i = 0; i < data.length; ++i){
+              var node = document.createElement("LI");
+              var title = document.createTextNode(data[i].title);
+              var artist = document.createTextNode(data[i].artist);
+              var space = document.createTextNode(" | ");
+              node.appendChild(title);
+              node.appendChild(space);
+              node.appendChild(artist);
+              document.getElementById("rlst").appendChild(node);
+            }
+         });
+       });
+        $("#bk_add").click(function() {
+          $.post("/bk_add", $("#book_info").serialize());
+       });
+       $("#bk_show").click(function() {
+          $.get("/bk_show", function(data) {
+            for(var i = 0; i < data.length; ++i){
+              var node = document.createElement("LI");
+              var title = document.createTextNode(data[i].title);
+              var author = document.createTextNode(data[i].author);
+              var space = document.createTextNode(" | ");
+              node.appendChild(title);
+              node.appendChild(space);
+              node.appendChild(author);
+              document.getElementById("bklst").appendChild(node);
+            }
+         });
+       });
+       
+      });
+    </script>
+  </body>
+</html>
